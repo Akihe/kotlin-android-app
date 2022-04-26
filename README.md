@@ -2,7 +2,7 @@
 Aki Helin
 
 ## Topic
-To be desided
+To be decided
 
 ## Target  
 Android / Kotlin
