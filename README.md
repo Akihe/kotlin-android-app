@@ -1,7 +1,8 @@
 ## Name
-2nd year school project
+Aki Helin
 
 ## Topic
+To be desided
 
 ## Target  
 Android / Kotlin
