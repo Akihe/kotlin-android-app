@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import fi.tuni.foodrecipes.home.Recipe
 
 
 class CustomAdapter() :
