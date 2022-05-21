@@ -1,6 +1,8 @@
 package fi.tuni.foodrecipes.home
 
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,6 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentContainerView
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
@@ -36,10 +41,10 @@ data class Recipe(var id : Int, var title: String? = null, var image: String) {
 data class RecipeJsonObject(var results: MutableList<Recipe>? = null) {
 }
 
-class HomeFragment : Fragment(R.layout.fragment_home) {
+class HomeFragment : Fragment(R.layout.fragment_home), OnRecipeClickListener {
 
     lateinit var fetchButton : Button
-    var myAdapter = CustomAdapter()
+    var myAdapter = CustomAdapter(this)
     lateinit var recyclerView : RecyclerView
 
     override fun onCreateView(
@@ -47,10 +52,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_home, container, false
-        )
-
         super.onCreate(savedInstanceState)
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
+
         fetchButton = view.findViewById(R.id.fetchbutton)
         recyclerView = view.findViewById(R.id.recipeList)
 
@@ -72,8 +76,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 createObjects()
             }
         }
+
+        Log.d("asd", arguments?.getString("message").toString())
+        arguments?.putString("message", "viesti vaihdettu")
+
         return view
     }
+
+
 
     fun fetch (url : String) : String? {
         var result: String? = null
@@ -104,7 +114,15 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         return recipes as MutableList<Recipe>
     }
 
+    override fun onRecipeClick(id: Int) {
+        Log.d("id", id.toString())
+    }
 }
+
+interface OnRecipeClickListener {
+    fun onRecipeClick(id : Int)
+}
+
 
 var data = JSONObject("""{
     "offset": 0,
