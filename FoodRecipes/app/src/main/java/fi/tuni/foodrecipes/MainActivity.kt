@@ -1,10 +1,12 @@
 package fi.tuni.foodrecipes
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
@@ -12,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import fi.tuni.foodrecipes.favourites.FavouritesFragment
 import fi.tuni.foodrecipes.home.HomeFragment
+import fi.tuni.foodrecipes.home.Recipe
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
@@ -51,7 +54,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         bottomNav = findViewById(R.id.bottom_navigation)
-
 /*
         fetchButton = findViewById(R.id.fetchbutton)
         recyclerView = findViewById(R.id.recipeList)
@@ -72,6 +74,13 @@ class MainActivity : AppCompatActivity() {
 
         val homeFragment = HomeFragment()
         val favouritesFragment = FavouritesFragment()
+
+        val bundle = Bundle()
+
+        bundle.putIntArray("favourites", intArrayOf(1, 2))
+
+        homeFragment.arguments = bundle
+        favouritesFragment.arguments = bundle
 
         setCurrentFragment(homeFragment)
         bottomNav.setOnItemSelectedListener { item ->
@@ -148,6 +157,5 @@ fun fetcher(url:String) {
 }
 
 viewHolder.itemView.setOnClickListener {Log.d("view", adapterData[position].id.toString())}
-
 
  */
