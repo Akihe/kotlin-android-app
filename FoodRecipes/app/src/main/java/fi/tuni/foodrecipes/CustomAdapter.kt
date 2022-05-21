@@ -4,14 +4,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import fi.tuni.foodrecipes.home.OnRecipeClickListener
 import fi.tuni.foodrecipes.home.Recipe
 
 
-class CustomAdapter() :
+class CustomAdapter(val listener: OnRecipeClickListener) :
     RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
     private val adapterData = mutableListOf<Recipe>()
 
@@ -22,6 +24,8 @@ class CustomAdapter() :
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val textView: TextView = view.findViewById(R.id.myTextView)
         val imageView : ImageView = view.findViewById(R.id.imageView)
+        val button : Button = view.findViewById(R.id.favButton)
+
     }
 
     // Create new views (invoked by the layout manager)
@@ -37,6 +41,9 @@ class CustomAdapter() :
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
+        viewHolder.button.setOnClickListener {
+            listener.onRecipeClick(adapterData[position].id)
+        }
         viewHolder.textView.text = adapterData[position].title
         Picasso.get().load(adapterData[position].image).into(viewHolder.imageView)
     }
@@ -45,11 +52,9 @@ class CustomAdapter() :
     override fun getItemCount() = adapterData.size
 
     fun setData(data: List<Recipe>) {
-
         adapterData.apply {
             clear()
             addAll(data)
         }
     }
-
 }
