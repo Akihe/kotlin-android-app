@@ -1,10 +1,10 @@
 package fi.tuni.foodrecipes
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -24,7 +24,7 @@ class CustomAdapter(val listener: OnRecipeClickListener) :
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val textView: TextView = view.findViewById(R.id.myTextView)
         val imageView : ImageView = view.findViewById(R.id.imageView)
-        val button : Button = view.findViewById(R.id.favButton)
+        val button : ImageButton = view.findViewById(R.id.favButton)
 
     }
 
@@ -41,8 +41,12 @@ class CustomAdapter(val listener: OnRecipeClickListener) :
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
+        viewHolder.itemView.setOnClickListener {
+            listener.onRecipeClick(adapterData[position])
+        }
+
         viewHolder.button.setOnClickListener {
-            listener.onRecipeClick(adapterData[position].id)
+            listener.onRecipeButtonClick(adapterData[position].id)
         }
         viewHolder.textView.text = adapterData[position].title
         Picasso.get().load(adapterData[position].image).into(viewHolder.imageView)
