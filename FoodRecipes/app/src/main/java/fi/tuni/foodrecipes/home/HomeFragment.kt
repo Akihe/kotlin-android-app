@@ -1,8 +1,6 @@
 package fi.tuni.foodrecipes.home
 
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,19 +8,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentContainerView
-import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import fi.tuni.foodrecipes.CustomAdapter
 import fi.tuni.foodrecipes.R
+import fi.tuni.foodrecipes.recipe.RecipeDetailsFragment
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
@@ -44,7 +40,7 @@ data class RecipeJsonObject(var results: MutableList<Recipe>? = null) {
 class HomeFragment : Fragment(R.layout.fragment_home), OnRecipeClickListener {
 
     lateinit var fetchButton : Button
-    var myAdapter = CustomAdapter(this)
+    private var myAdapter = CustomAdapter(this)
     lateinit var recyclerView : RecyclerView
 
     override fun onCreateView(
@@ -60,7 +56,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), OnRecipeClickListener {
 
         recyclerView
             .apply {
-                layoutManager = LinearLayoutManager(activity)
+                layoutManager = GridLayoutManager(activity, 2)
             }
 
             thread {
@@ -114,13 +110,23 @@ class HomeFragment : Fragment(R.layout.fragment_home), OnRecipeClickListener {
         return recipes as MutableList<Recipe>
     }
 
-    override fun onRecipeClick(id: Int) {
+    override fun onRecipeButtonClick(id: Int) {
         Log.d("id", id.toString())
+    }
+
+    override fun onRecipeClick(recipe: Recipe) {
+        arguments?.putInt("id", recipe.id)
+        activity?.supportFragmentManager?.beginTransaction()?.apply {
+            addToBackStack(HomeFragment().javaClass.canonicalName)//optional
+            replace(R.id.flFragment, RecipeDetailsFragment())
+            commit()
+        }
     }
 }
 
 interface OnRecipeClickListener {
-    fun onRecipeClick(id : Int)
+    fun onRecipeButtonClick(id : Int)
+    fun onRecipeClick(recipe : Recipe)
 }
 
 
