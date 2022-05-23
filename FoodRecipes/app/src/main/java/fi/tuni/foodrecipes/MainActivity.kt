@@ -1,5 +1,6 @@
 package fi.tuni.foodrecipes
 
+import android.app.Activity
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -9,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
@@ -178,4 +181,17 @@ class MainActivity : AppCompatActivity() {
         sensorManager!!.unregisterListener(sensorListener)
         super.onPause()
     }
+}
+//used for closing the keyboard
+fun Fragment.hideKeyboard() {
+    view?.let { activity?.hideKeyboard(it) }
+}
+//used for closing the keyboard
+fun Activity.hideKeyboard() {
+    hideKeyboard(currentFocus ?: View(this))
+}
+//used for closing the keyboard
+fun Context.hideKeyboard(view: View) {
+    val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
 }
