@@ -109,7 +109,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), OnRecipeClickListener {
                 // Api call is limited to 10 elements because theres hundreds of matches and calls are limited.
                 try {
                     val data =
-                        createObjects("https://api.spoonacular.com/recipes/complexSearch?query=${input}&number=1&sort=random&apiKey=a84165b11bbe41f0ae6ff525b82eed8e")
+                        createObjects("https://api.spoonacular.com/recipes/complexSearch?query=${input}&number=10&sort=random&apiKey=a84165b11bbe41f0ae6ff525b82eed8e")
                     activity?.runOnUiThread {
                         myAdapter.setData(data)
                         model.previousFetchedData = data
@@ -167,6 +167,9 @@ class HomeFragment : Fragment(R.layout.fragment_home), OnRecipeClickListener {
     fun openData(filesDir: File) {
         model.openFavourites(filesDir)
         model.openPreviousFetched(filesDir)
+        if (model.previousFetchedData.size > 0) {
+            myAdapter.setData(model.previousFetchedData)
+        }
     }
 
     // Implemented listeners function, calls the common ViewModel to add a favourite recipe.
