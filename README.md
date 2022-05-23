@@ -8,5 +8,8 @@ Mobile application which allows you to search for food recipes. API used = https
 Android / Kotlin
 
 
-## Google Play Link  
-Updated when ready
+## How to use
+Clone the repository, import the cloned folder to Android Studio and run the app using an emulator or your own device.
+
+## Youtube
+https://youtu.be/pLKDdo9ZtMQ
