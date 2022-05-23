@@ -42,7 +42,6 @@ data class randomJoke(val text : String) {
  */
 class MainActivity : AppCompatActivity() {
 
-
     lateinit var bottomNav : BottomNavigationView
 
     // For detecting phones movement
@@ -63,7 +62,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         bottomNav = findViewById(R.id.bottom_navigation)
-
 
         //SensorManager to detect phones movement
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -128,7 +126,6 @@ class MainActivity : AppCompatActivity() {
                                 Toast.makeText(applicationContext, "Api call failed", Toast.LENGTH_LONG)
                                     .show()
                             }
-
                         }
                     }
                 }
