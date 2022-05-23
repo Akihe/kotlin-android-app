@@ -10,14 +10,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import fi.tuni.foodrecipes.adapters.FavouritesAdapter
 import fi.tuni.foodrecipes.R
 import fi.tuni.foodrecipes.SharedViewModel
-import fi.tuni.foodrecipes.home.HomeFragment
+import fi.tuni.foodrecipes.adapters.FavouritesAdapter
 import fi.tuni.foodrecipes.home.Recipe
 import fi.tuni.foodrecipes.listeners.FavouriteListListener
 import fi.tuni.foodrecipes.recipe.RecipeDetailsFragment
-import kotlin.concurrent.thread
 
 /**
  * Works as the Favourites tab ui-view.

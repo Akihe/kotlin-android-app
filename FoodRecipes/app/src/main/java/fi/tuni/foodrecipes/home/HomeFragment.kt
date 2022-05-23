@@ -2,7 +2,6 @@ package fi.tuni.foodrecipes.home
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -15,13 +14,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
-import fi.tuni.foodrecipes.adapters.CustomAdapter
 import fi.tuni.foodrecipes.R
 import fi.tuni.foodrecipes.SharedViewModel
+import fi.tuni.foodrecipes.adapters.CustomAdapter
 import fi.tuni.foodrecipes.hideKeyboard
 import fi.tuni.foodrecipes.listeners.OnRecipeClickListener
 import fi.tuni.foodrecipes.recipe.RecipeDetailsFragment
-import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
