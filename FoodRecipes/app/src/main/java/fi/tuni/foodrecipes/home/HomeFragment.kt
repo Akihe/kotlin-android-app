@@ -3,9 +3,7 @@ package fi.tuni.foodrecipes.home
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.KeyEvent
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.Fragment
@@ -21,7 +19,9 @@ import fi.tuni.foodrecipes.hideKeyboard
 import fi.tuni.foodrecipes.listeners.OnRecipeClickListener
 import fi.tuni.foodrecipes.recipe.RecipeDetailsFragment
 import java.io.BufferedReader
+import java.io.File
 import java.io.InputStreamReader
+import java.io.Serializable
 import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.URL
@@ -31,7 +31,7 @@ import kotlin.concurrent.thread
  * An object created out of each recipe that is fetched from the api
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class Recipe(var id : Int, var title: String? = null, var image: String) {
+data class Recipe(var id : Int, var title: String? = null, var image: String): Serializable {
     constructor() : this(id = 0, title = null, image = "")
     override fun toString(): String {
         return "$title"
@@ -73,15 +73,8 @@ class HomeFragment : Fragment(R.layout.fragment_home), OnRecipeClickListener {
      */
     private val model: SharedViewModel by activityViewModels()
 
-
     @SuppressLint("NotifyDataSetChanged")
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Get the current view
-        val view = inflater.inflate(R.layout.fragment_home, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         editText = view.findViewById(R.id.inputField)
         fetchButton = view.findViewById(R.id.fetchbutton)
@@ -92,7 +85,11 @@ class HomeFragment : Fragment(R.layout.fragment_home), OnRecipeClickListener {
                 layoutManager = GridLayoutManager(activity, 2)
         }
         // Add "dummydata" to the list on open just so the view isnt empty.
-        myAdapter.setData(dummyList)
+        if (model.previousFetchedData.size > 0) {
+            myAdapter.setData(model.previousFetchedData)
+        } else {
+            myAdapter.setData(dummyList)
+        }
         // Apply the adapter
         recyclerView.adapter = myAdapter
 
@@ -112,9 +109,10 @@ class HomeFragment : Fragment(R.layout.fragment_home), OnRecipeClickListener {
                 // Api call is limited to 10 elements because theres hundreds of matches and calls are limited.
                 try {
                     val data =
-                        createObjects("https://api.spoonacular.com/recipes/complexSearch?query=${input}&number=10&apiKey=a84165b11bbe41f0ae6ff525b82eed8e")
+                        createObjects("https://api.spoonacular.com/recipes/complexSearch?query=${input}&number=1&sort=random&apiKey=a84165b11bbe41f0ae6ff525b82eed8e")
                     activity?.runOnUiThread {
                         myAdapter.setData(data)
+                        model.previousFetchedData = data
                         // Tell the adapter that data has changed = refreshes the view
                         myAdapter.notifyDataSetChanged()
                     }
@@ -125,7 +123,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), OnRecipeClickListener {
             // Also hide the keyboard when button is pressed
             hideKeyboard()
         }
-        return view
+        super.onViewCreated(view, savedInstanceState)
     }
 
     /**
@@ -149,6 +147,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), OnRecipeClickListener {
         return result
     }
 
+
     /**
      * Creates Recipe objects based on the fetched data, puts them in to a list
      */
@@ -160,6 +159,16 @@ class HomeFragment : Fragment(R.layout.fragment_home), OnRecipeClickListener {
         return recipes as MutableList<Recipe>
     }
 
+    fun saveData(filesDir: File) {
+        model.saveFavourites(filesDir)
+        model.savePreviousFetched(filesDir)
+    }
+
+    fun openData(filesDir: File) {
+        model.openFavourites(filesDir)
+        model.openPreviousFetched(filesDir)
+    }
+
     // Implemented listeners function, calls the common ViewModel to add a favourite recipe.
     override fun onRecipeButtonClick(recipe: Recipe) {
         model.addFavouriteRecipe(recipe)
@@ -169,7 +178,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), OnRecipeClickListener {
     override fun onRecipeClick(recipe: Recipe) {
         activity?.supportFragmentManager?.beginTransaction()?.apply {
             // Makes it possible to return to previous view by pressing back button
-            addToBackStack(HomeFragment().javaClass.canonicalName)
+            addToBackStack(null)
             replace(R.id.flFragment, RecipeDetailsFragment(recipe.id))
             commit()
         }

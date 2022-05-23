@@ -39,6 +39,9 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites), FavouriteList
         model.favouriteRecipesLiveData.observe(viewLifecycleOwner, Observer<List<Recipe>> { recipe ->
             myAdapter.setData(recipe)
         })
+        if(model.favouriteRecipes.size > 0) {
+            myAdapter.setData(model.favouriteRecipes)
+        }
 
         recyclerView = view.findViewById(R.id.favouriteList)
         // Apply a LinearLayoutManager to list all the elements vertically

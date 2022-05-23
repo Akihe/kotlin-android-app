@@ -42,6 +42,7 @@ data class randomJoke(val text : String) {
  */
 class MainActivity : AppCompatActivity() {
 
+
     lateinit var bottomNav : BottomNavigationView
 
     // For detecting phones movement
@@ -53,15 +54,16 @@ class MainActivity : AppCompatActivity() {
     private val MIN_TIME_BETWEEN_SHAKES_MILLISECS = 2000
     private var mLastShakeTime = 0L
 
+    // Home-view
+    val homeFragment = HomeFragment()
+    // Favourites-view
+    val favouritesFragment = FavouritesFragment()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         bottomNav = findViewById(R.id.bottom_navigation)
 
-        // Home-view
-        val homeFragment = HomeFragment()
-        // Favourites-view
-        val favouritesFragment = FavouritesFragment()
 
         //SensorManager to detect phones movement
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -171,6 +173,16 @@ class MainActivity : AppCompatActivity() {
             replace(R.id.flFragment,fragment)
             commit()
         }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        homeFragment.saveData(filesDir)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        homeFragment.openData(filesDir)
+        super.onRestoreInstanceState(savedInstanceState)
+    }
 
     override fun onResume() {
         sensorManager?.registerListener(sensorListener, sensorManager!!.getDefaultSensor(
