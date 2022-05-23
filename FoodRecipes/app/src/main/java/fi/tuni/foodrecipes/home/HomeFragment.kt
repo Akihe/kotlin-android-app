@@ -3,7 +3,6 @@ package fi.tuni.foodrecipes.home
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.os.Parcelable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -16,7 +15,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
-import fi.tuni.foodrecipes.CustomAdapter
+import fi.tuni.foodrecipes.adapters.CustomAdapter
 import fi.tuni.foodrecipes.R
 import fi.tuni.foodrecipes.SharedViewModel
 import fi.tuni.foodrecipes.listeners.OnRecipeClickListener
