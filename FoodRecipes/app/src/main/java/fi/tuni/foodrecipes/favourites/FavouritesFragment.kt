@@ -19,10 +19,15 @@ import fi.tuni.foodrecipes.listeners.FavouriteListListener
 import fi.tuni.foodrecipes.recipe.RecipeDetailsFragment
 import kotlin.concurrent.thread
 
+/**
+ * Works as the Favourites tab ui-view.
+ */
 class FavouritesFragment : Fragment(R.layout.fragment_favourites), FavouriteListListener {
 
     lateinit var recyclerView : RecyclerView
+    // Handles the recyclerView data
     private var myAdapter = FavouritesAdapter(this)
+    // Used for sharing data between fragments
     private val model: SharedViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -30,19 +35,20 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites), FavouriteList
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        //find the view this fragment is related to
+        // Find the view this fragment is related to
         val view = inflater.inflate(R.layout.fragment_favourites, container, false)
-        //observe the LiveData variables current data == get the data from the variable every time it is updated
+        // Observe the LiveData variables current data == get the data from the variable every time it is updated
         model.favouriteRecipesLiveData.observe(viewLifecycleOwner, Observer<List<Recipe>> { recipe ->
             myAdapter.setData(recipe)
         })
 
         recyclerView = view.findViewById(R.id.favouriteList)
+        // Apply a LinearLayoutManager to list all the elements vertically
         recyclerView
             .apply {
                 layoutManager = LinearLayoutManager(activity)
             }
-
+        //set the adapter
         recyclerView.adapter = myAdapter
         return view
     }
@@ -62,7 +68,8 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites), FavouriteList
      */
     override fun onRecipeClick(recipe: Recipe) {
         activity?.supportFragmentManager?.beginTransaction()?.apply {
-            addToBackStack(FavouritesFragment().javaClass.canonicalName) //makes it possible to return to previous view by pressing back button
+            //makes it possible to return to previous view by pressing the back button
+            addToBackStack(FavouritesFragment().javaClass.canonicalName)
             replace(R.id.flFragment, RecipeDetailsFragment(recipe.id))
             commit()
         }

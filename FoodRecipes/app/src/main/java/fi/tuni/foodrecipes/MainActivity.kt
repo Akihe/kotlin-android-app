@@ -30,27 +30,31 @@ import kotlin.collections.HashMap
 import kotlin.concurrent.thread
 import kotlin.math.sqrt
 
+/**
+ * An object for a random joke fetched from the api
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class randomJoke(val text : String) {
-
     constructor() : this(text = "")
-
     override fun toString(): String {
         return text
     }
 }
 
-
+/**
+ * MainActivity holds stuff behinds the scenes, but views are displayed as Fragments.
+ * The only activity thats used in this app
+ */
 class MainActivity : AppCompatActivity() {
 
     lateinit var bottomNav : BottomNavigationView
-    private var bundle = Bundle()
 
-    //For detecting phones movement
+    // For detecting phones movement
     private var sensorManager: SensorManager? = null
     private var acceleration = 0f
     private var currentAcceleration = 0f
     private var lastAcceleration = 0f
+    // Prevents the shaking effect to be called too often
     private val MIN_TIME_BETWEEN_SHAKES_MILLISECS = 2000
     private var mLastShakeTime = 0L
 
@@ -59,7 +63,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         bottomNav = findViewById(R.id.bottom_navigation)
 
+        // Home-view
         val homeFragment = HomeFragment()
+        // Favourites-view
         val favouritesFragment = FavouritesFragment()
 
         //SensorManager to detect phones movement
@@ -70,12 +76,10 @@ class MainActivity : AppCompatActivity() {
         currentAcceleration = SensorManager.GRAVITY_EARTH
         lastAcceleration = SensorManager.GRAVITY_EARTH
 
-        bundle.putIntArray("favourites", intArrayOf(1, 2))
-
-        homeFragment.arguments = bundle
-        favouritesFragment.arguments = bundle
-
+        // Set the first view to be homeFragment when opening the app
         setCurrentFragment(homeFragment)
+
+        // Handles changing the view to a different fragment when pressing an item in the navbar
         bottomNav.setOnItemSelectedListener { item ->
             when(item.itemId) {
                 R.id.page_1 -> {
@@ -83,16 +87,20 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.page_2 -> {
                     setCurrentFragment(favouritesFragment)
-
                 }
             }
             return@setOnItemSelectedListener true
         }
     }
 
+    /**
+     * Used for listening the phones movement, calculates the speed that the phone is moving on
+     * If the speed is fast enough, its treated as shaking the phone
+     */
     private val sensorListener: SensorEventListener = object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent) {
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                // Current time from the system, to detect time between shakes
                 val curTime = System.currentTimeMillis()
                 if ((curTime - mLastShakeTime) > MIN_TIME_BETWEEN_SHAKES_MILLISECS) {
 
@@ -106,13 +114,12 @@ class MainActivity : AppCompatActivity() {
                     acceleration = acceleration * 0.9f + delta
                     if (acceleration > 12) {
                         mLastShakeTime = curTime
-                        Log.d("shake", "shake")
+                        // If the speed to shake the phone was enough,
+                        // We call the api and fetch a random joke to be displayed at the bottom of the screen
+                        // If i had time this would be shown on a new fragment
                         thread {
                             val word =
                                 fetchRandomJoke("https://api.spoonacular.com/food/jokes/random?apiKey=a84165b11bbe41f0ae6ff525b82eed8e")
-                            if (word != null) {
-                                Log.d("shake", word)
-                            }
                             runOnUiThread {
                                 Toast.makeText(applicationContext, word, Toast.LENGTH_LONG)
                                     .show()
@@ -128,6 +135,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Fetch a random joke from the api
+     */
     private fun fetchRandomJoke(url: String) : String? {
         var result: String? = null
         val url = URL(url)
@@ -150,26 +160,14 @@ class MainActivity : AppCompatActivity() {
         return text.text
     }
 
-    // "https://api.spoonacular.com/recipes/findByIngredients?ingredients=apples,+flour,+sugar&number=2&apiKey=a84165b11bbe41f0ae6ff525b82eed8e"
-    // "https://api.spoonacular.com/recipes/1234/information/?apiKey=a84165b11bbe41f0ae6ff525b82eed8e"
-    // "https://api.spoonacular.com/recipes/complexSearch?query=pasta&maxFat=25&number=2&apiKey=a84165b11bbe41f0ae6ff525b82eed8e"
-
-
+    /**
+     * Handles changing the fragment. An UI-element called flFragment is replaced with the given fragment (home or favourites).
+     */
     private fun setCurrentFragment(fragment:Fragment)=
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.flFragment,fragment)
             commit()
         }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putString("favouritesString", bundle.getString("favouritesString"))
-        super.onSaveInstanceState(outState)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        bundle.putString("favouritesString", savedInstanceState.getString("favouritesString"))
-        super.onRestoreInstanceState(savedInstanceState)
-    }
 
     override fun onResume() {
         sensorManager?.registerListener(sensorListener, sensorManager!!.getDefaultSensor(

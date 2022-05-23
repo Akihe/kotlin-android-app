@@ -18,26 +18,28 @@ import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
 
+/**
+ * Holds the details of the recipe, fetched from the api.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class RecipeDetails(val name: String, val amount: AmountDetails) {
-
-    constructor() : this(name = "", AmountDetails()) {
-    }
+    constructor() : this(name = "", AmountDetails())
 }
 
+/**
+ * More details, fetched from the api
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class AmountDetails(val metric: MetricDetails) {
-
-    constructor() : this(metric = MetricDetails()) {
-
-    }
+    constructor() : this(metric = MetricDetails())
 }
+
+/**
+ * More details, fetched from the api
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class MetricDetails(val value: Int, val unit: String) {
-
-    constructor() : this(value = 0, unit = "") {
-
-    }
+    constructor() : this(value = 0, unit = "")
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -45,9 +47,13 @@ data class RecipeDetailsJSON(var ingredients: MutableList<RecipeDetails>? = null
 
 }
 
+/**
+ * Used for displaying the ingredients of a given recipe.
+ */
 class RecipeDetailsFragment(id: Int) : Fragment(R.layout.fragment_recipe_details) {
 
     lateinit var textView: TextView
+    // Id of the recipe, given as parameter when the recipe is clicked
     var myRecipeId = id
 
     override fun onCreateView(
@@ -58,24 +64,25 @@ class RecipeDetailsFragment(id: Int) : Fragment(R.layout.fragment_recipe_details
 
         val view = inflater.inflate(R.layout.fragment_recipe_details, container, false)
         textView = view.findViewById(R.id.ingredients)
+        // Enables a possibility to scroll the details textview, in case there is alot of ingredients.
         textView.movementMethod = ScrollingMovementMethod()
 
+        // Fetch the ingredients data using the id
         thread {
             val ingredients = createObjects("https://api.spoonacular.com/recipes/${myRecipeId}/ingredientWidget.json?apiKey=a84165b11bbe41f0ae6ff525b82eed8e")
-
-            var resultString = ingredients.joinToString(separator = "\n") { "${it.name}: ${it.amount.metric.value} ${it.amount.metric.unit}" }
+            // Put all the data in to a String, separated by line breaks.
+            val resultString = ingredients.joinToString(separator = "\n") { "${it.name}: ${it.amount.metric.value} ${it.amount.metric.unit}" }
+            // Set the fetched data to be displayed in the view
             activity?.runOnUiThread {
                 textView.text = resultString
             }
         }
-
-        // var ingredients = createObjects()
-        //var resultString = ingredients.joinToString(separator = "\n") { "${it.name}: ${it.amount.metric.value} ${it.amount.metric.unit}" }
-        //textView.text = resultString
-
         return view
     }
 
+    /**
+     * Fetches JSON from the given url, converts it to a one line string
+     */
     fun fetch (url : String) : String? {
         var result: String? = null
         val url = URL(url)
@@ -94,9 +101,11 @@ class RecipeDetailsFragment(id: Int) : Fragment(R.layout.fragment_recipe_details
         return result
     }
 
+    /**
+     * Creates RecipeDetails objects based on the fetched data, puts them in to a list
+     */
     fun createObjects (url : String): MutableList<RecipeDetails>{
-        //var data = fetch(url)
-        var data = jsondata.toString()
+        val data = fetch(url)
         val mp = ObjectMapper()
         val myObject: RecipeDetailsJSON = mp.readValue(data, RecipeDetailsJSON::class.java)
         val recipes: MutableList<RecipeDetails>? = myObject.ingredients
@@ -104,162 +113,3 @@ class RecipeDetailsFragment(id: Int) : Fragment(R.layout.fragment_recipe_details
     }
 
 }
-
-val jsondata = JSONObject("""{
-   "ingredients":[
-      {
-         "name":"butter",
-         "image":"butter-sliced.jpg",
-         "amount":{
-            "metric":{
-               "value":1.0,
-               "unit":"Tbsp"
-            },
-            "us":{
-               "value":1.0,
-               "unit":"Tbsp"
-            }
-         }
-      },
-      {
-         "name":"frozen cauliflower florets",
-         "image":"cauliflower.jpg",
-         "amount":{
-            "metric":{
-               "value":200.0,
-               "unit":"g"
-            },
-            "us":{
-               "value":2.0,
-               "unit":"cups"
-            }
-         }
-      },
-      {
-         "name":"cheese",
-         "image":"cheddar-cheese.png",
-         "amount":{
-            "metric":{
-               "value":2.0,
-               "unit":"Tbsps"
-            },
-            "us":{
-               "value":2.0,
-               "unit":"Tbsps"
-            }
-         }
-      },
-      {
-         "name":"extra virgin olive oil",
-         "image":"olive-oil.jpg",
-         "amount":{
-            "metric":{
-               "value":1.0,
-               "unit":"Tbsp"
-            },
-            "us":{
-               "value":1.0,
-               "unit":"Tbsp"
-            }
-         }
-      },
-      {
-         "name":"garlic",
-         "image":"garlic.png",
-         "amount":{
-            "metric":{
-               "value":5.0,
-               "unit":"cloves"
-            },
-            "us":{
-               "value":5.0,
-               "unit":"cloves"
-            }
-         }
-      },
-      {
-         "name":"pasta",
-         "image":"fusilli.jpg",
-         "amount":{
-            "metric":{
-               "value":170.097,
-               "unit":"g"
-            },
-            "us":{
-               "value":6.0,
-               "unit":"ounces"
-            }
-         }
-      },
-      {
-         "name":"red pepper flakes",
-         "image":"red-pepper-flakes.jpg",
-         "amount":{
-            "metric":{
-               "value":2.0,
-               "unit":"pinches"
-            },
-            "us":{
-               "value":2.0,
-               "unit":"pinches"
-            }
-         }
-      },
-      {
-         "name":"salt and pepper",
-         "image":"salt-and-pepper.jpg",
-         "amount":{
-            "metric":{
-               "value":2.0,
-               "unit":"servings"
-            },
-            "us":{
-               "value":2.0,
-               "unit":"servings"
-            }
-         }
-      },
-      {
-         "name":"green white scallions",
-         "image":"spring-onions.jpg",
-         "amount":{
-            "metric":{
-               "value":3.0,
-               "unit":""
-            },
-            "us":{
-               "value":3.0,
-               "unit":""
-            }
-         }
-      },
-      {
-         "name":"white wine",
-         "image":"white-wine.jpg",
-         "amount":{
-            "metric":{
-               "value":2.0,
-               "unit":"Tbsps"
-            },
-            "us":{
-               "value":2.0,
-               "unit":"Tbsps"
-            }
-         }
-      },
-      {
-         "name":"whole wheat bread crumbs",
-         "image":"breadcrumbs.jpg",
-         "amount":{
-            "metric":{
-               "value":27.0,
-               "unit":"g"
-            },
-            "us":{
-               "value":0.25,
-               "unit":"cup"
-            }
-         }
-      }
-   ]
-}""")
