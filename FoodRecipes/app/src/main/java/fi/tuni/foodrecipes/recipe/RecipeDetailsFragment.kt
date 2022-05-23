@@ -1,19 +1,16 @@
 package fi.tuni.foodrecipes.recipe
 
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import fi.tuni.foodrecipes.R
-import fi.tuni.foodrecipes.home.Recipe
-import fi.tuni.foodrecipes.home.RecipeJsonObject
-import fi.tuni.foodrecipes.home.data
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -43,36 +40,38 @@ data class MetricDetails(val value: Int, val unit: String) {
     }
 }
 
-
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class RecipeDetailsJSON(var ingredients: MutableList<RecipeDetails>? = null) {
 
 }
 
-class RecipeDetailsFragment : Fragment(R.layout.fragment_recipe_details) {
+class RecipeDetailsFragment(id: Int) : Fragment(R.layout.fragment_recipe_details) {
 
     lateinit var textView: TextView
-
+    var myRecipeId = id
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        thread {
-            // val data = fetch("https://api.spoonacular.com/recipes/716429/ingredientWidget.json?apiKey=a84165b11bbe41f0ae6ff525b82eed8e")
-            // println(data)
-        }
-        var view = inflater.inflate(R.layout.fragment_recipe_details, container, false)
 
+        val view = inflater.inflate(R.layout.fragment_recipe_details, container, false)
         textView = view.findViewById(R.id.ingredients)
-        textView.text = "tekstiä"
-        var ingreds =  createObjects()
-        println(ingreds)
-        var resultString = ingreds.joinToString(separator = "\n") { "${it.name}: ${it.amount.metric.value} ${it.amount.metric.unit}" }
-        println(resultString)
-        textView.text = resultString
+        textView.movementMethod = ScrollingMovementMethod()
+
+        thread {
+            val ingredients = createObjects("https://api.spoonacular.com/recipes/${myRecipeId}/ingredientWidget.json?apiKey=a84165b11bbe41f0ae6ff525b82eed8e")
+
+            var resultString = ingredients.joinToString(separator = "\n") { "${it.name}: ${it.amount.metric.value} ${it.amount.metric.unit}" }
+            activity?.runOnUiThread {
+                textView.text = resultString
+            }
+        }
+
+        // var ingredients = createObjects()
+        //var resultString = ingredients.joinToString(separator = "\n") { "${it.name}: ${it.amount.metric.value} ${it.amount.metric.unit}" }
+        //textView.text = resultString
 
         return view
     }
@@ -95,10 +94,8 @@ class RecipeDetailsFragment : Fragment(R.layout.fragment_recipe_details) {
         return result
     }
 
-    fun createObjects (): MutableList<RecipeDetails>{
-
-        //var data = fetch("https://api.spoonacular.com/recipes/complexSearch?query=pasta&maxFat=25&apiKey=a84165b11bbe41f0ae6ff525b82eed8e")
-
+    fun createObjects (url : String): MutableList<RecipeDetails>{
+        //var data = fetch(url)
         var data = jsondata.toString()
         val mp = ObjectMapper()
         val myObject: RecipeDetailsJSON = mp.readValue(data, RecipeDetailsJSON::class.java)
