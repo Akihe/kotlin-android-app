@@ -1,9 +1,9 @@
 package fi.tuni.foodrecipes.home
 
-
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import fi.tuni.foodrecipes.adapters.CustomAdapter
 import fi.tuni.foodrecipes.R
 import fi.tuni.foodrecipes.SharedViewModel
+import fi.tuni.foodrecipes.hideKeyboard
 import fi.tuni.foodrecipes.listeners.OnRecipeClickListener
 import fi.tuni.foodrecipes.recipe.RecipeDetailsFragment
 import org.json.JSONObject
@@ -41,13 +42,31 @@ data class Recipe(var id : Int, var title: String? = null, var image: String) {
 data class RecipeJsonObject(var results: MutableList<Recipe>? = null) {
 }
 
+val r1 = Recipe(716429,"Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs","https://spoonacular.com/recipeImages/716429-312x231.jpg")
+val r2 = Recipe(715538,"What to make for dinner tonight?? Bruschetta Style Pork & Pasta","https://spoonacular.com/recipeImages/715538-312x231.jpg")
+val r3 = Recipe(638125,"Chicken In A Pot","https://spoonacular.com/recipeImages/638125-312x231.jpg")
+val r4 = Recipe(631882,"5-Minute Rocky Road Fudge","https://spoonacular.com/recipeImages/631882-556x370.jpg")
+val r5 = Recipe(650855,"Mangoes with Rum and Ice Cream","https://spoonacular.com/recipeImages/650855-556x370.jpg")
+val r6 = Recipe(654835,"Pasta e Fagioli (Pasta and Beans)","https://spoonacular.com/recipeImages/654835-312x231.jpg")
+var dummyList = mutableListOf(r1, r2, r3, r4, r5, r6)
+
+/**
+ * Main view, displays the search bar and recipe list.
+ */
 class HomeFragment : Fragment(R.layout.fragment_home), OnRecipeClickListener {
 
     private lateinit var editText: EditText
     private lateinit var fetchButton : Button
+
+    /**
+     * Handles putting data into recyclerView, gets listener as parameter to allow calling functions implemented here in HomeFragment
+     */
     private var myAdapter = CustomAdapter(this)
     lateinit var recyclerView : RecyclerView
-    private var favourites = arrayListOf<Recipe>()
+
+    /**
+     * ViewModel used to share data between fragments (favourites list)
+     */
     private val model: SharedViewModel by activityViewModels()
 
 
@@ -57,33 +76,38 @@ class HomeFragment : Fragment(R.layout.fragment_home), OnRecipeClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        //Get the current view
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
         editText = view.findViewById(R.id.inputField)
         fetchButton = view.findViewById(R.id.fetchbutton)
         recyclerView = view.findViewById(R.id.recipeList)
 
-        recyclerView
-            .apply {
+        recyclerView.apply {
                 layoutManager = GridLayoutManager(activity, 2)
-            }
+        }
+        myAdapter.setData(dummyList) //add dummydata to the list on open just so the view isnt empty.
+        recyclerView.adapter = myAdapter
 
-            thread {
-                activity?.runOnUiThread {
-                    recyclerView.adapter = myAdapter
-                }
+        //Detects when the user presses enter on keyboard, calls the Search buttons onclick action
+        editText.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
+                fetchButton.callOnClick()
+                return@OnKeyListener true
             }
+            false
+        })
 
         fetchButton.setOnClickListener {
             thread {
                 val input = editText.text.toString()
-                val data = createObjects("https://api.spoonacular.com/recipes/complexSearch?query=${input}&number=1&apiKey=a84165b11bbe41f0ae6ff525b82eed8e")
-                Log.d("data", data.toString())
-                activity?.runOnUiThread {
-                    myAdapter.setData(data)
-                    myAdapter.notifyDataSetChanged()
-                }
+                //val data = createObjects("https://api.spoonacular.com/recipes/complexSearch?query=${input}&number=1&apiKey=a84165b11bbe41f0ae6ff525b82eed8e")
+                //activity?.runOnUiThread {
+                //    myAdapter.setData(data)
+                //    myAdapter.notifyDataSetChanged()
+                //}
             }
+            hideKeyboard()
         }
         Log.d("asd", arguments?.getString("message").toString())
         return view
@@ -109,8 +133,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), OnRecipeClickListener {
 //"https://api.spoonacular.com/recipes/complexSearch?query=pasta&maxFat=25&apiKey=a84165b11bbe41f0ae6ff525b82eed8e"
     fun createObjects (url : String) : MutableList<Recipe> {
 
-        //val data = fetch(url)
-        val data = myData.toString()
+        val data = fetch(url)
 
         val mp = ObjectMapper()
         val myObject: RecipeJsonObject = mp.readValue(data, RecipeJsonObject::class.java)
@@ -119,43 +142,14 @@ class HomeFragment : Fragment(R.layout.fragment_home), OnRecipeClickListener {
     }
 
     override fun onRecipeButtonClick(recipe: Recipe) {
-        favourites.add(recipe)
         model.addFavouriteRecipe(recipe)
     }
 
     override fun onRecipeClick(recipe: Recipe) {
         activity?.supportFragmentManager?.beginTransaction()?.apply {
-            addToBackStack(HomeFragment().javaClass.canonicalName)//optional
+            addToBackStack(HomeFragment().javaClass.canonicalName) //makes it possible to return to previous view by pressing back button
             replace(R.id.flFragment, RecipeDetailsFragment(recipe.id))
             commit()
         }
     }
 }
-
-var myData = JSONObject("""{
-    "offset": 0,
-    "number": 2,
-    "results": [
-    {
-        "id": 716429,
-        "title": "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs",
-        "calories": 584,
-        "carbs": "84g",
-        "fat": "20g",
-        "image": "https://spoonacular.com/recipeImages/716429-312x231.jpg",
-        "imageType": "jpg",
-        "protein": "19g"
-    },
-    {
-        "id": 715538,
-        "title": "What to make for dinner tonight?? Bruschetta Style Pork & Pasta",
-        "calories": 521,
-        "carbs": "69g",
-        "fat": "10g",
-        "image": "https://spoonacular.com/recipeImages/715538-312x231.jpg",
-        "imageType": "jpg",
-        "protein": "35g"
-    }
-    ],
-    "totalResults": 86
-}""")
