@@ -4,4 +4,5 @@ import fi.tuni.foodrecipes.home.Recipe
 
 interface FavouriteListListener {
     fun deleteFavourite(recipe: Recipe)
+    fun onRecipeClick(recipe: Recipe)
 }
