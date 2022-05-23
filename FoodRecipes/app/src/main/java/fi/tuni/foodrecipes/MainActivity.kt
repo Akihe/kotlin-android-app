@@ -111,14 +111,22 @@ class MainActivity : AppCompatActivity() {
                         mLastShakeTime = curTime
                         // If the speed to shake the phone was enough,
                         // We call the api and fetch a random joke to be displayed at the bottom of the screen
-                        // If i had time this would be shown on a new fragment
-                        thread {
-                            val word =
-                                fetchRandomJoke("https://api.spoonacular.com/food/jokes/random?apiKey=a84165b11bbe41f0ae6ff525b82eed8e")
+                        // If i had time this would be shown on a new fragment, there is not enough time to read the joke now
+                        try {
+                            thread {
+                                val word =
+                                    fetchRandomJoke("https://api.spoonacular.com/food/jokes/random?apiKey=a84165b11bbe41f0ae6ff525b82eed8e")
+                                runOnUiThread {
+                                    Toast.makeText(applicationContext, word, Toast.LENGTH_LONG)
+                                        .show()
+                                }
+                            }
+                        } catch (e: Exception) {
                             runOnUiThread {
-                                Toast.makeText(applicationContext, word, Toast.LENGTH_LONG)
+                                Toast.makeText(applicationContext, "Api call failed", Toast.LENGTH_LONG)
                                     .show()
                             }
+
                         }
                     }
                 }

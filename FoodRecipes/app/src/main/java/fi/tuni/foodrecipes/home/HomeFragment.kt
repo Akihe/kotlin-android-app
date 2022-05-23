@@ -22,6 +22,7 @@ import fi.tuni.foodrecipes.listeners.OnRecipeClickListener
 import fi.tuni.foodrecipes.recipe.RecipeDetailsFragment
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
@@ -109,11 +110,16 @@ class HomeFragment : Fragment(R.layout.fragment_home), OnRecipeClickListener {
             thread {
                 val input = editText.text.toString()
                 // Api call is limited to 10 elements because theres hundreds of matches and calls are limited.
-                val data = createObjects("https://api.spoonacular.com/recipes/complexSearch?query=${input}&number=10&apiKey=a84165b11bbe41f0ae6ff525b82eed8e")
-                activity?.runOnUiThread {
-                    myAdapter.setData(data)
-                    // Tell the adapter that data has changed = refreshes the view
-                    myAdapter.notifyDataSetChanged()
+                try {
+                    val data =
+                        createObjects("https://api.spoonacular.com/recipes/complexSearch?query=${input}&number=10&apiKey=a84165b11bbe41f0ae6ff525b82eed8e")
+                    activity?.runOnUiThread {
+                        myAdapter.setData(data)
+                        // Tell the adapter that data has changed = refreshes the view
+                        myAdapter.notifyDataSetChanged()
+                    }
+                } catch (e : Exception) {
+                    // Just do nothing if the api call doesnt work
                 }
             }
             // Also hide the keyboard when button is pressed

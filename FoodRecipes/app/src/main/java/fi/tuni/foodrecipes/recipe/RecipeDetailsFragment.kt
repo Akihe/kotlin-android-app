@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import fi.tuni.foodrecipes.R
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
@@ -67,12 +68,19 @@ class RecipeDetailsFragment(id: Int) : Fragment(R.layout.fragment_recipe_details
 
         // Fetch the ingredients data using the id
         thread {
-            val ingredients = createObjects("https://api.spoonacular.com/recipes/${myRecipeId}/ingredientWidget.json?apiKey=a84165b11bbe41f0ae6ff525b82eed8e")
-            // Put all the data in to a String, separated by line breaks.
-            val resultString = ingredients.joinToString(separator = "\n") { "${it.name}: ${it.amount.metric.value} ${it.amount.metric.unit}" }
-            // Set the fetched data to be displayed in the view
-            activity?.runOnUiThread {
-                textView.text = resultString
+            try {
+                val ingredients =
+                    createObjects("https://api.spoonacular.com/recipes/${myRecipeId}/ingredientWidget.json?apiKey=a84165b11bbe41f0ae6ff525b82eed8e")
+                // Put all the data in to a String, separated by line breaks.
+                val resultString =
+                    ingredients.joinToString(separator = "\n") { "${it.name}: ${it.amount.metric.value} ${it.amount.metric.unit}" }
+                // Set the fetched data to be displayed in the view
+                activity?.runOnUiThread {
+                    textView.text = resultString
+                }
+            } catch (e: Exception) {
+                // Let the user know the api call failed when fetching the ingredients
+                textView.text = "Api call failed"
             }
         }
         return view
