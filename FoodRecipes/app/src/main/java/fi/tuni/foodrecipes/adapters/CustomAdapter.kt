@@ -1,4 +1,4 @@
-package fi.tuni.foodrecipes
+package fi.tuni.foodrecipes.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import fi.tuni.foodrecipes.R
 import fi.tuni.foodrecipes.home.Recipe
 import fi.tuni.foodrecipes.listeners.OnRecipeClickListener
 
