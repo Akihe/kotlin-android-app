@@ -22,7 +22,7 @@ class CustomAdapter(private val listener: OnRecipeClickListener) :
      * (custom ViewHolder).
      */
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val textView: TextView = view.findViewById(R.id.myTextView)
+        val textView: TextView = view.findViewById(R.id.recipeTitle)
         val imageView : ImageView = view.findViewById(R.id.imageView)
         val button : ImageButton = view.findViewById(R.id.favButton)
     }
