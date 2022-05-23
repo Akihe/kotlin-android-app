@@ -43,7 +43,6 @@ data class MetricDetails(val value: Int, val unit: String) {
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class RecipeDetailsJSON(var ingredients: MutableList<RecipeDetails>? = null) {
-
 }
 
 /**
