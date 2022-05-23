@@ -70,7 +70,7 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites), FavouriteList
     override fun onRecipeClick(recipe: Recipe) {
         activity?.supportFragmentManager?.beginTransaction()?.apply {
             //makes it possible to return to previous view by pressing the back button
-            addToBackStack(FavouritesFragment().javaClass.canonicalName)
+            addToBackStack(null)
             replace(R.id.flFragment, RecipeDetailsFragment(recipe.id))
             commit()
         }
