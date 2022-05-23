@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Food Recipes</string>
+    <string name="search">Search</string>
+    <string name="e_g_chicken_bacon_flour">E.g. chicken, bacon, flour</string>
 </resources>
