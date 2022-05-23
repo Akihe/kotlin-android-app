@@ -9,7 +9,7 @@ import java.io.*
 /**
  * Used for sharing data between fragments
  */
-class SharedViewModel(private val state: SavedStateHandle) : ViewModel() {
+class SharedViewModel() : ViewModel() {
 
     // LiveData variable that can be observer = tells when the data is changed
     val favouriteRecipesLiveData = MutableLiveData<List<Recipe>>()
@@ -18,6 +18,7 @@ class SharedViewModel(private val state: SavedStateHandle) : ViewModel() {
     var favouriteRecipes = ArrayList<Recipe>()
     var previousFetchedData = mutableListOf<Recipe>()
 
+    // Used to save favourite recipes to phone
     fun saveFavourites(filesDir: File) {
         val file = FileOutputStream("$filesDir/favourites.txt")
         val outStream = ObjectOutputStream(file)
@@ -25,7 +26,7 @@ class SharedViewModel(private val state: SavedStateHandle) : ViewModel() {
         outStream.close()
         file.close()
     }
-
+    // Open the saved favourites
     fun openFavourites(filesDir: File) {
         val file = FileInputStream("$filesDir/favourites.txt")
         val inStream = ObjectInputStream(file)
@@ -33,6 +34,7 @@ class SharedViewModel(private val state: SavedStateHandle) : ViewModel() {
         favouriteRecipes = items
     }
 
+    // Save last fetched recipes
     fun savePreviousFetched(filesDir: File) {
         val file = FileOutputStream("$filesDir/previousfetched.txt")
         val outStream = ObjectOutputStream(file)
@@ -41,13 +43,13 @@ class SharedViewModel(private val state: SavedStateHandle) : ViewModel() {
         file.close()
     }
 
+    // Open the last fetched recipes
     fun openPreviousFetched(filesDir: File) {
         val file = FileInputStream("$filesDir/previousfetched.txt")
         val inStream = ObjectInputStream(file)
         val items = inStream.readObject() as MutableList<Recipe>
         previousFetchedData = items
     }
-
 
     // Add a new recipe to favourites, replace the LiveData
     fun addFavouriteRecipe(recipe: Recipe) {
