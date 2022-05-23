@@ -25,6 +25,11 @@ class FavouritesAdapter(private val listener: FavouriteListListener) :
     override fun onBindViewHolder(viewHolder: CustomAdapter.ViewHolder, position: Int) {
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
+
+        viewHolder.itemView.setOnClickListener {
+            listener.onRecipeClick(adapterData[position])
+        }
+
         viewHolder.button.setOnClickListener {
             listener.deleteFavourite(adapterData[position])
         }
